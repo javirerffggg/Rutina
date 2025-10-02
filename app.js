@@ -3,7 +3,7 @@
 // ==========================================
 
 // Fecha de inicio del plan (ajústala según tu inicio real)
-const FECHA_INICIO_PLAN = new Date('2024-11-04'); // 4 de noviembre de 2024
+const FECHA_INICIO_PLAN = new Date('2025-11-04'); // 4 de noviembre de 2024
 
 // Peso corporal del usuario (en kg) - AJUSTAR SEGÚN EL USUARIO
 const PESO_USUARIO = 68.25;
@@ -17,129 +17,138 @@ const PLAN_COMPLETO = {
         {
             id: 'fase1',
             nombre: 'FASE 1: TRANSICIÓN Y MANTENIMIENTO',
-            duracion: 28, // días
+            duracion: 28, // días (4 semanas: del 4 nov al 1 dic)
             descripcion: 'Recuperación y búsqueda del mantenimiento calórico',
             
             semanas: [
                 {
                     numero: 1,
                     nombre: 'Semana 1-2: Descarga Activa',
+                    semanaInicio: 0, // Semana 0-1 dentro de la fase
                     mesociclo: 'descarga',
                     rir: '3-4',
                     cardio: '1-2 sesiones de LISS (30-45 min de caminata)',
                     calorias: '2600-2800 kcal',
                     proteina: '1.8 g/kg',
                     grasas: '25% del total calórico',
-                    nota: 'Empieza con las calorías de tu fase de volumen'
+                    nota: 'Empieza con las calorías de tu fase de volumen. Monitoriza tu peso.'
                 },
                 {
                     numero: 2,
                     nombre: 'Semana 3-4: Búsqueda del Mantenimiento',
+                    semanaInicio: 2, // Semana 2-3 dentro de la fase
                     mesociclo: 'mesociclo1',
                     rir: '2-3',
                     cardio: '2 sesiones de LISS (30-45 min)',
                     calorias: '2600-2800 kcal (ajustar según peso)',
                     proteina: '1.8 g/kg',
                     grasas: '25% del total',
-                    nota: 'Monitoriza tu peso promedio semanal para encontrar tu mantenimiento'
+                    nota: 'Monitoriza tu peso promedio semanal para encontrar tu mantenimiento real.'
                 }
             ]
         },
         {
             id: 'fase2',
             nombre: 'FASE 2: DEFINICIÓN PRINCIPAL',
-            duracion: 119, // días (17 semanas aprox)
+            duracion: 147, // días (21 semanas: del 2 dic al 28 abril)
             descripcion: 'Pérdida de grasa sostenible preservando masa muscular',
             
             semanas: [
                 {
                     numero: 1,
                     nombre: 'Diciembre-Enero: Inicio del Déficit',
+                    semanaInicio: 0, // Primeras ~8 semanas
                     mesociclo: 'mesociclo2',
                     rir: '1-2',
                     cardio: '3 sesiones de LISS (30-45 min) a 130-140 ppm',
                     calorias: '2200-2400 kcal',
                     proteina: '2.0-2.5 g/kg',
                     grasas: '0.8-1.0 g/kg',
-                    nota: 'Déficit de 300-500 kcal. Mantén la fuerza como prioridad'
+                    nota: 'Déficit de 300-500 kcal. Mantén la fuerza como prioridad.'
                 },
                 {
                     numero: 2,
                     nombre: 'Febrero: Descanso de Dieta',
+                    semanaInicio: 8, // Semanas 8-9 (diet break)
                     mesociclo: 'descarga',
                     rir: '3-4',
                     cardio: '2 sesiones de LISS',
                     calorias: 'Volver a mantenimiento (2700 kcal aprox)',
                     proteina: '1.8-2.0 g/kg',
                     grasas: '25% del total',
-                    nota: 'Diet Break: 1-2 semanas en mantenimiento para resetear metabolismo'
+                    nota: 'Diet Break: 1-2 semanas en mantenimiento para resetear metabolismo y hormona leptina.'
                 },
                 {
                     numero: 3,
-                    nombre: 'Marzo: Continuación del Déficit',
+                    nombre: 'Marzo-Abril: Continuación del Déficit',
+                    semanaInicio: 10, // Semanas 10-21 hasta el final de la fase
                     mesociclo: 'mesociclo3',
                     rir: '1-2',
                     cardio: '4 sesiones de LISS (40 min) o 3 LISS + 1 HIIT (10-15 min)',
                     calorias: '2100-2300 kcal',
                     proteina: '2.0-2.5 g/kg',
                     grasas: '0.8-1.0 g/kg',
-                    nota: 'Ajusta calorías según tu nuevo peso. Protena muy alta'
+                    nota: 'Ajusta calorías según tu nuevo peso. Proteína muy alta para preservar músculo.'
                 }
             ]
         },
         {
             id: 'fase3',
             nombre: 'FASE 3: PULIDO FINAL',
-            duracion: 76, // días (11 semanas aprox hasta 15 junio)
+            duracion: 49, // días (7 semanas: del 29 abril al 15 junio)
             descripcion: 'Alcanzar el pico de definición',
             
             semanas: [
                 {
                     numero: 1,
-                    nombre: 'Abril-Mayo: Pico de Definición',
+                    nombre: 'Abril-Junio: Pico de Definición',
+                    semanaInicio: 0, // Todas las 7 semanas de esta fase
                     mesociclo: 'mesociclo3',
                     rir: '1-2',
                     cardio: '4-5 sesiones de LISS (45 min) o 3 LISS + 2 HIIT',
                     calorias: '2000-2200 kcal',
                     proteina: '2.5 g/kg',
                     grasas: '0.8 g/kg',
-                    nota: 'Último empujón. Ajusta si es necesario reducir 100-150 kcal más'
-                },
-                {
-                    numero: 2,
-                    nombre: 'Junio: Dieta Inversa',
-                    mesociclo: 'mesociclo1',
-                    rir: '2-3',
-                    cardio: '1-2 sesiones de LISS',
-                    calorias: 'Aumenta +100-150 kcal/semana',
-                    proteina: '2.0 g/kg',
-                    grasas: '1.0 g/kg',
-                    nota: 'Reverse diet gradual hasta volver a mantenimiento sin ganar grasa'
+                    nota: 'Último empujón hacia el objetivo. Ajusta si es necesario reducir 100-150 kcal más.'
                 }
             ]
         },
         {
             id: 'fase4',
             nombre: 'FASE 4: MANTENIMIENTO DE VERANO',
-            duracion: 999, // indefinido
-            descripcion: 'Mantener el físico alcanzado',
+            duracion: 999, // indefinido (del 16 junio en adelante)
+            descripcion: 'Mantener el físico alcanzado y recuperar metabolismo',
             
             semanas: [
                 {
                     numero: 1,
-                    nombre: 'Verano: Mantenimiento',
+                    nombre: 'Junio: Dieta Inversa',
+                    semanaInicio: 0, // Primeras 2-4 semanas de la fase
+                    mesociclo: 'mesociclo1',
+                    rir: '2-3',
+                    cardio: '2-3 sesiones de LISS (30 min) o actividades recreativas',
+                    calorias: 'Aumenta +100-150 kcal/semana gradualmente',
+                    proteina: '2.0 g/kg',
+                    grasas: '1.0 g/kg',
+                    nota: 'Reverse diet gradual: aumenta calorías semanalmente hasta volver a mantenimiento sin ganar grasa.'
+                },
+                {
+                    numero: 2,
+                    nombre: 'Julio en adelante: Mantenimiento',
+                    semanaInicio: 4, // A partir de la semana 4 de la fase
                     mesociclo: 'mesociclo1',
                     rir: '2-3',
                     cardio: '1-2 sesiones por semana o actividades que disfrutes',
                     calorias: 'Mantenimiento (2600-2800 kcal aprox)',
                     proteina: '1.8-2.0 g/kg',
                     grasas: '25% del total',
-                    nota: 'Disfruta de tu físico y mantén un estilo de vida activo'
+                    nota: 'Disfruta de tu físico. Mantén un estilo de vida activo y flexible.'
                 }
             ]
         }
     ]
 };
+
 
 // ==========================================
 // DATOS DE MESOCICLOS (HEREDADOS DEL CÓDIGO ANTERIOR)
@@ -470,7 +479,77 @@ function obtenerFechaFormateada() {
 // ==========================================
 
 function renderizarPantallaHoy() {
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    
     const fecha = obtenerFechaFormateada();
+    
+    // ============================================
+    // LÓGICA ESPECIAL: SI EL PLAN NO HA COMENZADO
+    // ============================================
+    if (hoy < FECHA_INICIO_PLAN) {
+        const diasFaltantes = Math.ceil((FECHA_INICIO_PLAN - hoy) / (1000 * 60 * 60 * 24));
+        
+        document.getElementById('fecha-actual').textContent = fecha.completa;
+        document.getElementById('fase-nombre').textContent = `🔜 EL PLAN COMIENZA EN ${diasFaltantes} DÍAS`;
+        
+        // Mostrar vista previa del primer día (Fase 1, Descarga, Día 1)
+        const faseInicial = PLAN_COMPLETO.fases[0];
+        const configInicial = faseInicial.semanas[0];
+        
+        // Título especial indicando que es vista previa
+        document.getElementById('dia-entrenamiento-nombre').textContent = 
+            '👀 Vista Previa: ' + rutinasData['descarga'].dias[1].nombre;
+        document.getElementById('training-meta').textContent = 
+            'Así será tu primer día de entrenamiento (Lunes 4 de Noviembre)';
+        
+        // Renderizar ejercicios de la primera semana
+        const container = document.getElementById('exercise-list');
+        container.innerHTML = '';
+        
+        rutinasData['descarga'].dias[1].ejercicios.forEach((ejercicio, index) => {
+            const div = document.createElement('div');
+            div.className = 'exercise-item';
+            div.dataset.index = index;
+            
+            div.innerHTML = `
+                <div class="exercise-header">
+                    <div class="checkbox"></div>
+                    <div class="exercise-content">
+                        <div class="exercise-name">${ejercicio.nombre}</div>
+                        <div class="exercise-meta">${ejercicio.detalles} | <strong>RIR ${ejercicio.rir}</strong></div>
+                    </div>
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn-exercise" disabled style="opacity: 0.5;">
+                        ⚖️ Peso
+                    </button>
+                    <button class="btn-exercise" onclick="iniciarTemporizador(${ejercicio.descanso})">
+                        ⏱️ ${formatearTiempoBoton(ejercicio.descanso)}
+                    </button>
+                </div>
+            `;
+            
+            container.appendChild(div);
+        });
+        
+        document.getElementById('ver-calentamiento').style.display = 'block';
+        
+        // Cardio y nutrición de la primera semana (vista previa)
+        document.getElementById('cardio-plan').innerHTML = 
+            `<span class="cardio-highlight">📍 ${configInicial.cardio}</span>`;
+        document.getElementById('calorias-objetivo').textContent = configInicial.calorias;
+        document.getElementById('proteina-objetivo').textContent = configInicial.proteina;
+        document.getElementById('grasas-objetivo').textContent = configInicial.grasas;
+        document.getElementById('nutrition-note').textContent = `💡 ${configInicial.nota}`;
+        document.getElementById('nutrition-note').style.display = 'block';
+        
+        return; // Detener aquí - no ejecutar el código normal
+    }
+    
+    // ============================================
+    // LÓGICA NORMAL: EL PLAN YA COMENZÓ
+    // ============================================
     const faseInfo = calcularFaseActual();
     const diaEntrenamiento = obtenerDiaEntrenamiento(fecha.numeroSemana);
     
