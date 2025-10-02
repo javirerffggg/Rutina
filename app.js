@@ -407,11 +407,13 @@ function calcularFaseActual() {
             const diasEnFase = diasDesdeInicio - diasAcumulados;
             const semanaEnFase = Math.floor(diasEnFase / 7);
             
-            // Determinar qué configuración de semana aplicar
-            let configSemana = fase.semanas[0];
-            for (let sem of fase.semanas) {
-                if (semanaEnFase >= (sem.numero - 1)) {
-                    configSemana = sem;
+            // Determinar qué configuración de semana aplicar según semanaInicio
+            let configSemana = fase.semanas[0]; // Por defecto la primera
+            
+            for (let i = fase.semanas.length - 1; i >= 0; i--) {
+                if (semanaEnFase >= fase.semanas[i].semanaInicio) {
+                    configSemana = fase.semanas[i];
+                    break;
                 }
             }
             
@@ -419,7 +421,8 @@ function calcularFaseActual() {
                 fase: fase,
                 configSemana: configSemana,
                 diasEnFase: diasEnFase,
-                semanaEnFase: semanaEnFase + 1
+                semanaEnFase: semanaEnFase + 1,
+                semanaGlobal: Math.floor(diasDesdeInicio / 7) + 1
             };
         }
         diasAcumulados += fase.duracion;
@@ -427,11 +430,18 @@ function calcularFaseActual() {
     
     // Si superamos todas las fases, devolver la última (mantenimiento)
     const ultimaFase = PLAN_COMPLETO.fases[PLAN_COMPLETO.fases.length - 1];
+    const diasEnFase = diasDesdeInicio - diasAcumulados + ultimaFase.duracion;
+    const semanaEnFase = Math.floor(diasEnFase / 7);
+    
+    // En mantenimiento, después de 4 semanas cambiar a la segunda configuración
+    let configSemana = semanaEnFase >= 4 ? ultimaFase.semanas[1] : ultimaFase.semanas[0];
+    
     return {
         fase: ultimaFase,
-        configSemana: ultimaFase.semanas[0],
-        diasEnFase: 0,
-        semanaEnFase: 1
+        configSemana: configSemana,
+        diasEnFase: diasEnFase,
+        semanaEnFase: semanaEnFase + 1,
+        semanaGlobal: Math.floor(diasDesdeInicio / 7) + 1
     };
 }
 
