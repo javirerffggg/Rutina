@@ -1,0 +1,711 @@
+/* ==========================================
+   VARIABLES Y RESET
+   ========================================== */
+:root {
+    --primary: #0f3460;
+    --secondary: #e94560;
+    --success: #00d4aa;
+    --warning: #ffa500;
+    --bg-dark: #1a1a2e;
+    --bg-medium: #16213e;
+    --bg-light: #2a3f5f;
+    --text-primary: #ffffff;
+    --text-secondary: #a8b2d1;
+    --border-radius: 12px;
+    --spacing: 1rem;
+    --nav-height: 70px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, var(--bg-dark) 0%, var(--primary) 100%);
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding-bottom: calc(var(--nav-height) + 1rem);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 var(--spacing);
+}
+
+/* ==========================================
+   NAVEGACIÓN INFERIOR (PESTAÑAS)
+   ========================================== */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--nav-height);
+    background: var(--bg-medium);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+}
+
+.nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.nav-item.active {
+    color: var(--secondary);
+}
+
+.nav-icon {
+    font-size: 1.5rem;
+}
+
+.nav-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.nav-item:active {
+    transform: scale(0.95);
+}
+
+/* ==========================================
+   PANTALLAS (SCREENS)
+   ========================================== */
+.screen {
+    display: none;
+    min-height: 100vh;
+    padding-top: 1rem;
+}
+
+.screen.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ==========================================
+   ENCABEZADO PRINCIPAL
+   ========================================== */
+.main-header {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    padding: 1.5rem var(--spacing);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.main-header h1 {
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.fecha-actual {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.subtitle {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+/* BADGE DE FASE ACTUAL */
+.fase-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--secondary), #ff6b6b);
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
+    text-transform: uppercase;
+}
+
+/* ==========================================
+   MÓDULOS (ENTRENAMIENTO, CARDIO, NUTRICIÓN)
+   ========================================== */
+.module {
+    background: var(--bg-medium);
+    border-radius: var(--border-radius);
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+.module-header {
+    background: var(--bg-light);
+    padding: 1rem 1.5rem;
+    border-bottom: 2px solid var(--primary);
+}
+
+.module-header h2 {
+    font-size: 1.25rem;
+    margin: 0;
+}
+
+.module-body {
+    padding: 1.5rem;
+}
+
+.module-body h3 {
+    color: var(--secondary);
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+}
+
+.training-meta {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+/* MÓDULO DE ENTRENAMIENTO - EL MÁS GRANDE */
+.module-training {
+    min-height: 400px;
+}
+
+.module-training .module-body {
+    padding: 1.5rem;
+}
+
+/* ==========================================
+   LISTA DE EJERCICIOS
+   ========================================== */
+.exercise-list {
+    margin-bottom: 1.5rem;
+}
+
+.exercise-item {
+    background: var(--bg-light);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.exercise-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.exercise-item.completed {
+    border-color: var(--success);
+    background: rgba(0, 212, 170, 0.1);
+}
+
+.exercise-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    border: 2px solid var(--text-secondary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-dark);
+    transition: all 0.3s ease;
+}
+
+.exercise-item.completed .checkbox {
+    background: var(--success);
+    border-color: var(--success);
+}
+
+.checkbox::after {
+    content: '✓';
+    color: transparent;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.exercise-item.completed .checkbox::after {
+    color: var(--bg-dark);
+}
+
+.exercise-content {
+    flex: 1;
+}
+
+.exercise-name {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.exercise-meta {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.exercise-meta strong {
+    color: var(--warning);
+}
+
+.exercise-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.btn-exercise {
+    flex: 1;
+    background: var(--primary);
+    color: var(--text-primary);
+    border: none;
+    padding: 0.5rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-exercise:active {
+    transform: scale(0.95);
+}
+
+.btn-link {
+    background: transparent;
+    border: 1px solid var(--primary);
+    color: var(--text-secondary);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.btn-link:hover {
+    background: var(--primary);
+    color: var(--text-primary);
+}
+
+/* DÍA DE DESCANSO */
+.rest-day {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.rest-day-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.rest-day h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.rest-day p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* ==========================================
+   TEMPORIZADOR FLOTANTE
+   ========================================== */
+.timer-float {
+    position: fixed;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--secondary), #ff6b6b);
+    padding: 1rem 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(233, 69, 96, 0.4);
+    z-index: 999;
+    min-width: 250px;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.timer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.btn-close-timer {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0;
+}
+
+.timer-display {
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    margin-bottom: 0.75rem;
+}
+
+.timer-controls {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.btn-timer-sm {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: var(--text-primary);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+/* ==========================================
+   MÓDULO DE CARDIO
+   ========================================== */
+.module-cardio .module-body p {
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.cardio-highlight {
+    color: var(--warning);
+    font-weight: 600;
+}
+
+/* ==========================================
+   MÓDULO DE NUTRICIÓN
+   ========================================== */
+.nutrition-goal {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.nutrition-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: var(--bg-light);
+    border-radius: 8px;
+}
+
+.nutrition-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.nutrition-value {
+    font-weight: 700;
+    color: var(--success);
+    font-size: 1.1rem;
+}
+
+.nutrition-note {
+    padding: 1rem;
+    background: rgba(255, 165, 0, 0.1);
+    border-left: 4px solid var(--warning);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+/* ==========================================
+   VISTA SEMANAL
+   ========================================== */
+.week-calendar {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.day-card {
+    background: var(--bg-medium);
+    border-radius: var(--border-radius);
+    padding: 1.25rem;
+    border-left: 4px solid var(--primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.day-card.today {
+    border-left-color: var(--secondary);
+    box-shadow: 0 4px 16px rgba(233, 69, 96, 0.3);
+}
+
+.day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.day-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--secondary);
+}
+
+.day-badge {
+    background: var(--primary);
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.day-summary {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+/* ==========================================
+   REGISTRO DE PROGRESO
+   ========================================== */
+.input-group {
+    margin-bottom: 1rem;
+}
+
+.input-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--primary);
+    border-radius: 8px;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.2);
+}
+
+.btn-primary {
+    width: 100%;
+    background: linear-gradient(135deg, var(--secondary), #ff6b6b);
+    color: var(--text-primary);
+    border: none;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+.btn-secondary {
+    width: 100%;
+    background: var(--bg-light);
+    color: var(--text-primary);
+    border: 2px solid var(--primary);
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.info-text {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.photo-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.photo-item {
+    aspect-ratio: 1;
+    background: var(--bg-light);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--text-secondary);
+}
+
+.chart-container {
+    margin-bottom: 2rem;
+}
+
+.chart-container canvas {
+    max-height: 250px;
+}
+
+/* ==========================================
+   MODALES
+   ========================================== */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--bg-medium);
+    border-radius: var(--border-radius);
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.modal-small {
+    max-width: 400px;
+}
+
+.modal-header {
+    background: var(--primary);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.modal-header h2 {
+    font-size: 1.25rem;
+    margin: 0;
+}
+
+.btn-close-modal {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.ramp-section {
+    margin-bottom: 1.5rem;
+}
+
+.ramp-section h3 {
+    color: var(--secondary);
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.ramp-section p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.exercise-name-modal {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--secondary);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+@media (max-width: 768px) {
+    .main-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .timer-float {
+        min-width: 200px;
+        padding: 0.75rem 1rem;
+    }
+    
+    .timer-display {
+        font-size: 2rem;
+    }
+    
+    .module-body {
+        padding: 1rem;
+    }
+}
