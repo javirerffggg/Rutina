@@ -1,0 +1,28 @@
+{
+  "name": "Mi Rutina Gym - Entrenamiento Diario",
+  "short_name": "Rutina Gym",
+  "description": "Aplicación PWA para seguir tu rutina de hipertrofia personalizada día a día, con seguimiento de progreso offline",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#0f3460",
+  "orientation": "portrait-primary",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "./icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "fitness", "lifestyle"],
+  "lang": "es-ES",
+  "dir": "ltr"
+}
