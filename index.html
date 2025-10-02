@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Meta tags específicos para iOS/Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Tu Plan Gym">
+    <meta name="theme-color" content="#1a1a2e">
+    
+    <!-- Iconos para iOS -->
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="icon" type="image/png" href="icons/icon-192x192.png">
+    
+    <title>Tu Plan de Gym - Hoy</title>
+    
+    <!-- Manifest para instalación PWA -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Chart.js para gráficos de progreso -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Estilos -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navegación por Pestañas -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" data-screen="hoy">
+            <span class="nav-icon">🏋️</span>
+            <span class="nav-label">Hoy</span>
+        </button>
+        <button class="nav-item" data-screen="semana">
+            <span class="nav-icon">📅</span>
+            <span class="nav-label">Semana</span>
+        </button>
+        <button class="nav-item" data-screen="progreso">
+            <span class="nav-icon">📊</span>
+            <span class="nav-label">Progreso</span>
+        </button>
+    </nav>
+
+    <!-- PANTALLA 1: TU PLAN DE HOY -->
+    <div class="screen active" id="screen-hoy">
+        <!-- Encabezado Dinámico -->
+        <header class="main-header">
+            <h1>Tu Plan para Hoy</h1>
+            <p class="fecha-actual" id="fecha-actual">Cargando...</p>
+            <div class="fase-badge" id="fase-badge">
+                <span id="fase-nombre">CARGANDO FASE...</span>
+            </div>
+        </header>
+
+        <main class="container">
+            <!-- Módulo de Entrenamiento de Fuerza (EL MÁS GRANDE) -->
+            <section class="module module-training">
+                <div class="module-header">
+                    <h2 id="training-title">🏋️ Entrenamiento de Fuerza</h2>
+                </div>
+                <div class="module-body">
+                    <h3 id="dia-entrenamiento-nombre">Cargando...</h3>
+                    <p class="training-meta" id="training-meta"></p>
+                    
+                    <!-- Lista de Ejercicios -->
+                    <div class="exercise-list" id="exercise-list">
+                        <!-- Se carga dinámicamente -->
+                    </div>
+
+                    <!-- Botón para Ver Calentamiento RAMP -->
+                    <button class="btn-link" id="ver-calentamiento">
+                        💡 Ver Protocolo de Calentamiento RAMP
+                    </button>
+                </div>
+            </section>
+
+            <!-- Temporizador de Descanso (Flotante) -->
+            <section class="timer-float" id="timer-float" style="display: none;">
+                <div class="timer-header">
+                    <span>⏱️ Descanso</span>
+                    <button class="btn-close-timer" id="close-timer">✕</button>
+                </div>
+                <div class="timer-display" id="timer-display">00:00</div>
+                <div class="timer-controls">
+                    <button class="btn-timer-sm" id="timer-start">▶️</button>
+                    <button class="btn-timer-sm" id="timer-pause" style="display:none;">⏸️</button>
+                    <button class="btn-timer-sm" id="timer-reset">🔄</button>
+                </div>
+            </section>
+
+            <!-- Módulo de Cardio -->
+            <section class="module module-cardio">
+                <div class="module-header">
+                    <h2>🏃 Cardio</h2>
+                </div>
+                <div class="module-body">
+                    <p id="cardio-plan">Cargando plan de cardio...</p>
+                </div>
+            </section>
+
+            <!-- Módulo de Nutrición -->
+            <section class="module module-nutrition">
+                <div class="module-header">
+                    <h2>🍽️ Nutrición</h2>
+                </div>
+                <div class="module-body">
+                    <div class="nutrition-goal">
+                        <div class="nutrition-item">
+                            <span class="nutrition-label">Calorías:</span>
+                            <span class="nutrition-value" id="calorias-objetivo">Cargando...</span>
+                        </div>
+                        <div class="nutrition-item">
+                            <span class="nutrition-label">Proteína:</span>
+                            <span class="nutrition-value" id="proteina-objetivo">Cargando...</span>
+                        </div>
+                        <div class="nutrition-item">
+                            <span class="nutrition-label">Grasas:</span>
+                            <span class="nutrition-value" id="grasas-objetivo">Cargando...</span>
+                        </div>
+                        <div class="nutrition-item">
+                            <span class="nutrition-label">Carbohidratos:</span>
+                            <span class="nutrition-value" id="carbos-objetivo">Resto de calorías</span>
+                        </div>
+                    </div>
+                    <p class="nutrition-note" id="nutrition-note"></p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- PANTALLA 2: VISTA SEMANAL -->
+    <div class="screen" id="screen-semana">
+        <header class="main-header">
+            <h1>Vista Semanal</h1>
+            <p class="subtitle">Tu plan de entrenamiento esta semana</p>
+        </header>
+
+        <main class="container">
+            <div class="week-calendar" id="week-calendar">
+                <!-- Se carga dinámicamente -->
+            </div>
+        </main>
+    </div>
+
+    <!-- PANTALLA 3: REGISTRO DE PROGRESO -->
+    <div class="screen" id="screen-progreso">
+        <header class="main-header">
+            <h1>Registro de Progreso</h1>
+            <p class="subtitle">Monitoriza tu evolución</p>
+        </header>
+
+        <main class="container">
+            <!-- Entrada de Datos Corporales -->
+            <section class="module">
+                <div class="module-header">
+                    <h2>📝 Registro de Medidas</h2>
+                </div>
+                <div class="module-body">
+                    <div class="input-group">
+                        <label for="peso-input">Peso Corporal (kg):</label>
+                        <input type="number" id="peso-input" step="0.1" placeholder="Ej: 68.5">
+                    </div>
+                    <div class="input-group">
+                        <label for="cintura-input">Cintura (cm):</label>
+                        <input type="number" id="cintura-input" step="0.5" placeholder="Ej: 82">
+                    </div>
+                    <div class="input-group">
+                        <label for="cadera-input">Cadera (cm):</label>
+                        <input type="number" id="cadera-input" step="0.5" placeholder="Ej: 95">
+                    </div>
+                    <div class="input-group">
+                        <label for="pecho-input">Pecho (cm):</label>
+                        <input type="number" id="pecho-input" step="0.5" placeholder="Ej: 98">
+                    </div>
+                    <button class="btn-primary" id="guardar-medidas">💾 Guardar Medidas</button>
+                </div>
+            </section>
+
+            <!-- Registro Fotográfico -->
+            <section class="module">
+                <div class="module-header">
+                    <h2>📸 Fotos de Progreso</h2>
+                </div>
+                <div class="module-body">
+                    <p class="info-text">Toma fotos cada 2-4 semanas: frontal, lateral y espalda</p>
+                    <button class="btn-secondary" id="agregar-foto">📷 Añadir Foto de Progreso</button>
+                    <div class="photo-gallery" id="photo-gallery">
+                        <!-- Se carga dinámicamente -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Gráficas de Progreso -->
+            <section class="module">
+                <div class="module-header">
+                    <h2>📈 Evolución</h2>
+                </div>
+                <div class="module-body">
+                    <div class="chart-container">
+                        <canvas id="peso-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="medidas-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal: Calentamiento RAMP -->
+    <div class="modal" id="modal-calentamiento">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Protocolo de Calentamiento RAMP</h2>
+                <button class="btn-close-modal" id="close-calentamiento">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="ramp-section">
+                    <h3>R - Raise (Elevar) - 5 minutos</h3>
+                    <p>Cardio ligero: cinta, bici estática, remo o elíptica a ritmo suave.</p>
+                </div>
+                <div class="ramp-section">
+                    <h3>A - Activate (Activar) - 2-3 minutos</h3>
+                    <p id="activate-content">Ejercicios específicos para la sesión de hoy.</p>
+                </div>
+                <div class="ramp-section">
+                    <h3>M - Mobilize (Movilizar) - 2-3 minutos</h3>
+                    <p id="mobilize-content">Movilidad dinámica específica.</p>
+                </div>
+                <div class="ramp-section">
+                    <h3>P - Potentiate (Potenciar) - 2-3 series</h3>
+                    <p>Series de aproximación del primer ejercicio con peso ligero.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Registro de Peso de Ejercicio -->
+    <div class="modal" id="modal-peso">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2>⚖️ Registrar Peso</h2>
+                <button class="btn-close-modal" id="close-peso">✕</button>
+            </div>
+            <div class="modal-body">
+                <p id="peso-exercise-name" class="exercise-name-modal"></p>
+                <div class="input-group">
+                    <label for="weight-input">Peso levantado (kg):</label>
+                    <input type="number" id="weight-input" step="2.5" placeholder="Ej: 50">
+                </div>
+                <div class="input-group">
+                    <label for="reps-input">Repeticiones:</label>
+                    <input type="number" id="reps-input" min="1" placeholder="Ej: 10">
+                </div>
+                <div class="input-group">
+                    <label for="series-input">Serie actual:</label>
+                    <input type="number" id="series-input" min="1" value="1" placeholder="1">
+                </div>
+                <button class="btn-primary" id="save-weight">💾 Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+    <script>
+        // Registro del Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('✅ SW registrado'))
+                    .catch(err => console.log('❌ Error SW:', err));
+            });
+        }
+    </script>
+</body>
+</html>
