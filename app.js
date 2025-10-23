@@ -1089,9 +1089,15 @@ function guardarPeso() {
     const peso = parseFloat(document.getElementById('weight-input').value);
     const reps = parseInt(document.getElementById('reps-input').value);
     const serie = parseInt(document.getElementById('series-input').value);
+    const rir = parseInt(document.getElementById('rir-input').value);
     
     if (!peso || !reps) {
         alert('Por favor completa peso y repeticiones');
+        return;
+    }
+    
+    if (rir === undefined || rir === null || rir < 0 || rir > 4) {
+        alert('⚠️ Por favor indica el RIR (Reps in Reserve) que experimentaste.\n\n0 = Fallo muscular\n1-2 = Zona óptima de hipertrofia\n3+ = Serie demasiado fácil');
         return;
     }
     
@@ -1105,6 +1111,7 @@ function guardarPeso() {
         peso: peso,
         reps: reps,
         serie: serie,
+        rir: rir,
         volumen: peso * reps
     };
     
@@ -1113,9 +1120,22 @@ function guardarPeso() {
     historial.push(registro);
     localStorage.setItem(clave, JSON.stringify(historial));
     
-    alert(`✅ Registrado: ${peso}kg × ${reps} reps (Serie ${serie})`);
+    // Feedback según RIR
+    let mensaje = `✅ Registrado: ${peso}kg × ${reps} reps (Serie ${serie})\n\n`;
+    if (rir === 0) {
+        mensaje += '💪 Llegaste al fallo. Perfecto para última serie.';
+    } else if (rir >= 1 && rir <= 2) {
+        mensaje += '🎯 RIR óptimo para hipertrofia. ¡Excelente!';
+    } else if (rir === 3) {
+        mensaje += '⚠️ Un poco fácil. Considera subir peso la próxima vez.';
+    } else {
+        mensaje += '⬆️ Demasiado fácil. Debes aumentar el peso significativamente.';
+    }
+    
+    alert(mensaje);
     cerrarModalPeso();
 }
+
 
 // ==========================================
 // NAVEGACIÓN ENTRE PANTALLAS
