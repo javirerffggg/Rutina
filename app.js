@@ -731,7 +731,8 @@ function renderizarVistaSemanal() {
 
 function renderizarPantallaProgreso() {
     cargarGraficosPeso();
-    cargarGaleriaTroFotos();
+    cargarGaleriaFotos();
+    renderizarVolumenSemanal(); // AÑADIR ESTA LÍNEA
 }
 
 function cargarGraficosPeso() {
