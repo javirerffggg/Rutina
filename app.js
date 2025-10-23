@@ -1371,3 +1371,206 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('📅 Fecha de inicio del plan:', FECHA_INICIO_PLAN.toLocaleDateString('es-ES'));
     console.log('📊 Fase actual:', calcularFaseActual().fase.nombre);
 });
+
+// ==========================================
+// CÁLCULO DE VOLUMEN SEMANAL
+// ==========================================
+
+const GRUPOS_MUSCULARES = {
+    'Pecho': ['Press de Banca', 'Press Inclinado', 'Fondos'],
+    'Espalda': ['Dominadas', 'Jalón', 'Remo'],
+    'Hombros': ['Press de Hombro', 'Elevaciones Laterales', 'Vuelos Posteriores'],
+    'Brazos': ['Curl', 'Martillo', 'Tríceps', 'Extensiones'],
+    'Piernas': ['Sentadilla', 'Prensa', 'Femoral', 'Cuádriceps', 'Hip Thrust', 'Talones', 'Goblet']
+};
+
+function calcularVolumenSemanal() {
+    const hoy = new Date();
+    const inicioSemana = new Date(hoy);
+    inicioSemana.setDate(hoy.getDate() - hoy.getDay() + 1); // Lunes
+    inicioSemana.setHours(0, 0, 0, 0);
+    
+    const volumenPorGrupo = {};
+    Object.keys(GRUPOS_MUSCULARES).forEach(grupo => {
+        volumenPorGrupo[grupo] = 0;
+    });
+    
+    // Recorrer todos los ejercicios de la semana
+    const faseInfo = calcularFaseActual();
+    const mesociclo = faseInfo.configSemana.mesociclo;
+    
+    for (let dia = 1; dia <= 3; dia++) {
+        const rutinaDia = rutinasData[mesociclo].dias[dia];
+        if (!rutinaDia || !rutinaDia.ejercicios) continue;
+        
+        rutinaDia.ejercicios.forEach((ejercicio, index) => {
+            const clave = `pesos_${mesociclo}_dia${dia}_ex${index}`;
+            const historial = JSON.parse(localStorage.getItem(clave) || '[]');
+            
+            // Filtrar solo registros de esta semana
+            const registrosSemana = historial.filter(reg => {
+                const fechaReg = new Date(reg.fecha);
+                return fechaReg >= inicioSemana;
+            });
+            
+            // Sumar volumen al grupo muscular correspondiente
+            const volumenEjercicio = registrosSemana.reduce((sum, reg) => sum + reg.volumen, 0);
+            
+            for (let [grupo, palabrasClave] of Object.entries(GRUPOS_MUSCULARES)) {
+                if (palabrasClave.some(palabra => ejercicio.nombre.includes(palabra))) {
+                    volumenPorGrupo[grupo] += volumenEjercicio;
+                    break;
+                }
+            }
+        });
+    }
+    
+    return volumenPorGrupo;
+}
+
+function renderizarVolumenSemanal() {
+    const volumen = calcularVolumenSemanal();
+    const volumenSemanaAnterior = obtenerVolumenSemanaAnterior();
+    
+    const container = document.getElementById('volume-stats');
+    
+    container.innerHTML = Object.entries(volumen).map(([grupo, vol]) => {
+        const volAnterior = volumenSemanaAnterior[grupo] || 0;
+        const cambio = vol - volAnterior;
+        const porcentaje = volAnterior > 0 ? ((cambio / volAnterior) * 100).toFixed(1) : 0;
+        
+        let claseCard = '';
+        let textoCambio = '';
+        if (cambio > 0) {
+            claseCard = 'increase';
+            textoCambio = `<span class="volume-up">+${porcentaje}% vs semana anterior</span>`;
+        } else if (cambio < 0) {
+            claseCard = 'decrease';
+            textoCambio = `<span class="volume-down">${porcentaje}% vs semana anterior</span>`;
+        } else {
+            textoCambio = '<span style="color: var(--text-secondary);">Sin cambios</span>';
+        }
+        
+        return `
+            <div class="volume-card ${claseCard}">
+                <div class="volume-card-title">${grupo}</div>
+                <div class="volume-card-value">
+                    ${vol.toLocaleString()} 
+                    <span class="volume-card-suffix">kg</span>
+                </div>
+                <div class="volume-card-change">${textoCambio}</div>
+            </div>
+        `;
+    }).join('');
+    
+    // Renderizar gráfico
+    renderizarGraficoVolumen(volumen);
+}
+
+function obtenerVolumenSemanaAnterior() {
+    // Implementación simplificada: buscar registros de hace 7-14 días
+    const hace7dias = new Date();
+    hace7dias.setDate(hace7dias.getDate() - 7);
+    const hace14dias = new Date();
+    hace14dias.setDate(hace14dias.getDate() - 14);
+    
+    const volumenPorGrupo = {};
+    Object.keys(GRUPOS_MUSCULARES).forEach(grupo => {
+        volumenPorGrupo[grupo] = 0;
+    });
+    
+    const faseInfo = calcularFaseActual();
+    const mesociclo = faseInfo.configSemana.mesociclo;
+    
+    for (let dia = 1; dia <= 3; dia++) {
+        const rutinaDia = rutinasData[mesociclo].dias[dia];
+        if (!rutinaDia || !rutinaDia.ejercicios) continue;
+        
+        rutinaDia.ejercicios.forEach((ejercicio, index) => {
+            const clave = `pesos_${mesociclo}_dia${dia}_ex${index}`;
+            const historial = JSON.parse(localStorage.getItem(clave) || '[]');
+            
+            const registrosSemanaAnterior = historial.filter(reg => {
+                const fechaReg = new Date(reg.fecha);
+                return fechaReg >= hace14dias && fechaReg < hace7dias;
+            });
+            
+            const volumenEjercicio = registrosSemanaAnterior.reduce((sum, reg) => sum + reg.volumen, 0);
+            
+            for (let [grupo, palabrasClave] of Object.entries(GRUPOS_MUSCULARES)) {
+                if (palabrasClave.some(palabra => ejercicio.nombre.includes(palabra))) {
+                    volumenPorGrupo[grupo] += volumenEjercicio;
+                    break;
+                }
+            }
+        });
+    }
+    
+    return volumenPorGrupo;
+}
+
+function renderizarGraficoVolumen(volumen) {
+    const ctx = document.getElementById('volume-chart-weekly');
+    if (!ctx) return;
+    
+    if (window.volumeChartWeekly) {
+        window.volumeChartWeekly.destroy();
+    }
+    
+    const labels = Object.keys(volumen);
+    const data = Object.values(volumen);
+    
+    window.volumeChartWeekly = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Volumen Total (kg)',
+                data: data,
+                backgroundColor: [
+                    'rgba(233, 69, 96, 0.7)',
+                    'rgba(0, 212, 170, 0.7)',
+                    'rgba(255, 165, 0, 0.7)',
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(153, 102, 255, 0.7)'
+                ],
+                borderColor: [
+                    '#e94560',
+                    '#00d4aa',
+                    '#ffa500',
+                    '#36a2eb',
+                    '#9966ff'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: 'Distribución de Volumen por Grupo Muscular (Esta Semana)',
+                    color: '#ffffff'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: '#a8b2d1' },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    title: {
+                        display: true,
+                        text: 'Volumen Total (kg)',
+                        color: '#ffffff'
+                    }
+                },
+                x: {
+                    ticks: { color: '#a8b2d1' },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                }
+            }
+        }
+    });
+}
