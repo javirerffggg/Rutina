@@ -256,7 +256,14 @@
                 <div class="input-group">
                     <label for="series-input">Serie actual:</label>
                     <input type="number" id="series-input" min="1" value="1" placeholder="1">
+                <div class="input-group">
+                    <label for="rir-input">RIR experimentado (0-4):</label>
+                    <input type="number" id="rir-input" min="0" max="4" placeholder="¿Cuántas reps más podrías hacer?">
+                    <small style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 0.25rem; display: block;">
+                        0 = Fallo muscular | 1-2 = Zona óptima | 3+ = Demasiado fácil
+                    </small>
                 </div>
+
                 <button class="btn-primary" id="save-weight">💾 Guardar</button>
             </div>
         </div>
