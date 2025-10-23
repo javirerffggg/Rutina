@@ -262,6 +262,39 @@
         </div>
     </div>
 
+     <!-- Modal: Historial del Ejercicio -->
+    <div class="modal" id="modal-historial">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📊 Historial de Progreso</h2>
+                <button class="btn-close-modal" id="close-historial">✕</button>
+            </div>
+            <div class="modal-body">
+                <h3 id="historial-exercise-name" class="exercise-name-modal"></h3>
+                <div class="chart-container">
+                    <canvas id="exercise-progress-chart"></canvas>
+                </div>
+                <div class="history-table">
+                    <h4 style="margin-top: 1.5rem; color: var(--secondary);">Últimas 10 Sesiones</h4>
+                    <table id="history-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Serie</th>
+                                <th>Peso</th>
+                                <th>Reps</th>
+                                <th>RIR</th>
+                                <th>Volumen</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="app.js"></script>
     <script>
