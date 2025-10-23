@@ -484,6 +484,28 @@ function obtenerFechaFormateada() {
     };
 }
 
+function calcularCarbohidratos(caloriasStr, proteinaStr, grasasStr, pesoUsuario) {
+    try {
+        // Usamos el rango bajo de calorías para el cálculo (ej: "2600-2800" -> 2600)
+        const calorias = parseFloat(caloriasStr.split('-')[0]); 
+        const proteinaGramos = parseFloat(proteinaStr) * pesoUsuario;
+
+        // Calculamos las grasas en gramos a partir del porcentaje calórico
+        const grasasGramos = (calorias * (parseFloat(grasasStr) / 100)) / 9;
+
+        const caloriasDeProteina = proteinaGramos * 4;
+        const caloriasDeGrasas = grasasGramos * 9;
+
+        const caloriasRestantes = calorias - (caloriasDeProteina + caloriasDeGrasas);
+        const carbohidratosGramos = Math.round(caloriasRestantes / 4);
+
+        return `${carbohidratosGramos} g`;
+    } catch (e) {
+        console.error("Error calculando carbohidratos:", e);
+        return 'Cargando...'; // Devuelve un valor por defecto si hay error
+    }
+}
+
 // ==========================================
 // RENDERIZADO DE PANTALLA 1: TU PLAN DE HOY
 // ==========================================
@@ -658,6 +680,7 @@ function renderizarModuloNutricion(faseInfo) {
     document.getElementById('calorias-objetivo').textContent = config.calorias;
     document.getElementById('proteina-objetivo').textContent = config.proteina;
     document.getElementById('grasas-objetivo').textContent = config.grasas;
+    document.getElementById('carbos-objetivo').textContent = calcularCarbohidratos(config.calorias, config.proteina, config.grasas, PESO_USUARIO);
     
     if (config.nota) {
         document.getElementById('nutrition-note').textContent = `💡 ${config.nota}`;
