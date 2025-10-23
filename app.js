@@ -874,6 +874,8 @@ function cargarGraficosPeso() {
     }
 }
 
+// REEMPLAZA LA FUNCIÓN ORIGINAL CON ESTA
+
 function cargarGaleriaFotos() {
     const fotos = JSON.parse(localStorage.getItem('fotos_progreso') || '[]');
     const container = document.getElementById('photo-gallery');
@@ -883,9 +885,10 @@ function cargarGaleriaFotos() {
         return;
     }
     
-    container.innerHTML = fotos.map((foto, index) => `
+    // Mapea cada URL de imagen guardada a un elemento de la galería
+    container.innerHTML = fotos.map((fotoSrc, index) => `
         <div class="photo-item">
-            <img src="${foto.url}" alt="Progreso ${index + 1}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+            <img src="${fotoSrc}" alt="Progreso ${index + 1}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
         </div>
     `).join('');
 }
@@ -961,8 +964,11 @@ function obtenerRegistrosMedidas() {
     return JSON.parse(localStorage.getItem('registros_medidas') || '[]');
 }
 
+// REEMPLAZA LA FUNCIÓN ORIGINAL CON ESTA
+
 function agregarFoto() {
-    alert('📸 Funcionalidad de fotos: Toma fotos con tu cámara y guárdalas manualmente. En una versión futura implementaremos carga de imágenes.');
+    // Simula un clic en el input de tipo "file" que está oculto
+    document.getElementById('foto-input').click();
 }
 
 // ==========================================
@@ -1681,6 +1687,27 @@ document.addEventListener('DOMContentLoaded', () => {
     // Eventos de registro de progreso
     document.getElementById('guardar-medidas').addEventListener('click', guardarMedidas);
     document.getElementById('agregar-foto').addEventListener('click', agregarFoto);
+    // =================================================================
+    // AÑADE ESTE BLOQUE DE CÓDIGO PARA MANEJAR LA SELECCIÓN DE LA FOTO
+    // =================================================================
+    document.getElementById('foto-input').addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const fotoSrc = e.target.result; // La imagen en formato base64
+            
+            // Guardar la nueva foto en el almacenamiento local
+            let fotos = JSON.parse(localStorage.getItem('fotos_progreso') || '[]');
+            fotos.push(fotoSrc);
+            localStorage.setItem('fotos_progreso', JSON.stringify(fotos));
+            
+            // Volver a cargar la galería para mostrar la nueva foto
+            cargarGaleriaFotos();
+        };
+        reader.readAsDataURL(file); // Convierte la imagen a un string
+    });
     
     console.log('✅ Aplicación inicializada correctamente');
     console.log('📅 Fecha de inicio del plan:', FECHA_INICIO_PLAN.toLocaleDateString('es-ES'));
