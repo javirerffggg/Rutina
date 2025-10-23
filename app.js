@@ -1708,6 +1708,15 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         reader.readAsDataURL(file); // Convierte la imagen a un string
     });
+
+    document.getElementById('exportar-datos').addEventListener('click', exportarCopiaDeSeguridad);
+    
+    document.getElementById('importar-datos').addEventListener('click', () => {
+        // Al hacer clic en el botón de importar, activamos el input oculto
+        document.getElementById('importar-input').click();
+    });
+    
+    document.getElementById('importar-input').addEventListener('change', importarCopiaDeSeguridad);
     
     console.log('✅ Aplicación inicializada correctamente');
     console.log('📅 Fecha de inicio del plan:', FECHA_INICIO_PLAN.toLocaleDateString('es-ES'));
@@ -1807,6 +1816,84 @@ function renderizarVolumenSemanal() {
     
     // Renderizar gráfico
     renderizarGraficoVolumen(volumen);
+}
+
+// ===============================================================
+// AÑADE ESTAS DOS NUEVAS FUNCIONES EN APP.JS
+// ===============================================================
+
+/**
+ * Recopila todos los datos del localStorage y los descarga como un archivo JSON.
+ */
+function exportarCopiaDeSeguridad() {
+    const backupData = {};
+    const keys = Object.keys(localStorage);
+
+    keys.forEach(key => {
+        // Solo guardamos las claves que pertenecen a nuestra app
+        if (key.startsWith('progreso_') || key.startsWith('pesos_') || key.startsWith('registros_') || key.startsWith('fotos_')) {
+            backupData[key] = localStorage.getItem(key);
+        }
+    });
+
+    if (Object.keys(backupData).length === 0) {
+        alert("Todavía no hay datos para exportar.");
+        return;
+    }
+
+    const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    
+    const fecha = new Date().toISOString().slice(0, 10); // Formato YYYY-MM-DD
+    a.href = url;
+    a.download = `copia_seguridad_gym_${fecha}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    alert("✅ Copia de seguridad exportada correctamente.");
+}
+
+/**
+ * Lee un archivo JSON seleccionado por el usuario e importa los datos al localStorage.
+ */
+function importarCopiaDeSeguridad(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const backupData = JSON.parse(e.target.result);
+            
+            if (!confirm("¿Estás seguro? Se borrarán todos los datos actuales y se reemplazarán por los del archivo de copia de seguridad.")) {
+                return;
+            }
+
+            // Limpiamos el localStorage actual de los datos de la app
+            const keys = Object.keys(localStorage);
+            keys.forEach(key => {
+                if (key.startsWith('progreso_') || key.startsWith('pesos_') || key.startsWith('registros_') || key.startsWith('fotos_')) {
+                    localStorage.removeItem(key);
+                }
+            });
+
+            // Importamos los nuevos datos
+            Object.keys(backupData).forEach(key => {
+                localStorage.setItem(key, backupData[key]);
+            });
+
+            alert("✅ Datos importados correctamente. La aplicación se recargará ahora.");
+            location.reload(); // Recargamos la página para que se apliquen los cambios
+
+        } catch (error) {
+            console.error("Error al importar el archivo:", error);
+            alert("❌ Error: El archivo seleccionado no es una copia de seguridad válida.");
+        }
+    };
+    reader.readAsText(file);
 }
 
 function obtenerVolumenSemanaAnterior() {
