@@ -1631,12 +1631,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.getElementById('modal-historial').addEventListener('click', (e) => {
-    if (e.target.id === 'modal-historial') {
-        cerrarHistorialEjercicio();
-    }
-});
-
     // PEGA AQUÍ EL CÓDIGO CORTADO
     document.getElementById('export-week-btn').addEventListener('click', exportarDatosSemana);
     
