@@ -1139,6 +1139,170 @@ function cambiarPantalla(nombrePantalla) {
 }
 
 // ==========================================
+// VISUALIZACIÓN DE PROGRESO POR EJERCICIO
+// ==========================================
+
+let ejercicioHistorialActual = null;
+
+function abrirHistorialEjercicio(indexEjercicio, nombreEjercicio) {
+    ejercicioHistorialActual = indexEjercicio;
+    document.getElementById('historial-exercise-name').textContent = nombreEjercicio;
+    
+    const faseInfo = calcularFaseActual();
+    const fecha = obtenerFechaFormateada();
+    const diaEntrenamiento = obtenerDiaEntrenamiento(fecha.numeroSemana);
+    const mesociclo = faseInfo.configSemana.mesociclo;
+    
+    const clave = `pesos_${mesociclo}_dia${diaEntrenamiento}_ex${indexEjercicio}`;
+    const historial = JSON.parse(localStorage.getItem(clave) || '[]');
+    
+    // Renderizar tabla
+    renderizarTablaHistorial(historial);
+    
+    // Renderizar gráfico
+    renderizarGraficoProgreso(historial, nombreEjercicio);
+    
+    document.getElementById('modal-historial').classList.add('active');
+}
+
+function cerrarHistorialEjercicio() {
+    document.getElementById('modal-historial').classList.remove('active');
+    if (window.exerciseProgressChart) {
+        window.exerciseProgressChart.destroy();
+    }
+}
+
+function renderizarTablaHistorial(historial) {
+    const tbody = document.getElementById('history-table-body');
+    
+    if (historial.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-secondary);">Sin datos aún</td></tr>';
+        return;
+    }
+    
+    const ultimas10 = historial.slice(-10).reverse();
+    
+    tbody.innerHTML = ultimas10.map(registro => {
+        const fecha = new Date(registro.fecha);
+        const fechaCorta = `${fecha.getDate()}/${fecha.getMonth() + 1}`;
+        
+        let rirClass = 'rir-good';
+        if (registro.rir >= 3) rirClass = 'rir-warning';
+        if (registro.rir >= 4) rirClass = 'rir-danger';
+        
+        return `
+            <tr>
+                <td>${fechaCorta}</td>
+                <td>S${registro.serie}</td>
+                <td><strong>${registro.peso}kg</strong></td>
+                <td>${registro.reps}</td>
+                <td><span class="rir-badge ${rirClass}">RIR ${registro.rir}</span></td>
+                <td class="volume-highlight">${registro.volumen}kg</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function renderizarGraficoProgreso(historial, nombreEjercicio) {
+    const ctx = document.getElementById('exercise-progress-chart');
+    
+    if (historial.length === 0) {
+        ctx.parentElement.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">Registra tu primera sesión para ver el progreso</p>';
+        return;
+    }
+    
+    // Agrupar por fecha y obtener la mejor serie de cada día
+    const mejoresPorDia = {};
+    historial.forEach(reg => {
+        const fecha = new Date(reg.fecha).toLocaleDateString('es-ES');
+        if (!mejoresPorDia[fecha] || reg.volumen > mejoresPorDia[fecha].volumen) {
+            mejoresPorDia[fecha] = reg;
+        }
+    });
+    
+    const datos = Object.values(mejoresPorDia);
+    const labels = datos.map(d => {
+        const f = new Date(d.fecha);
+        return `${f.getDate()}/${f.getMonth() + 1}`;
+    });
+    
+    if (window.exerciseProgressChart) {
+        window.exerciseProgressChart.destroy();
+    }
+    
+    window.exerciseProgressChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Peso (kg)',
+                data: datos.map(d => d.peso),
+                borderColor: '#e94560',
+                backgroundColor: 'rgba(233, 69, 96, 0.1)',
+                tension: 0.4,
+                fill: true,
+                yAxisID: 'y'
+            }, {
+                label: 'Repeticiones',
+                data: datos.map(d => d.reps),
+                borderColor: '#00d4aa',
+                backgroundColor: 'rgba(0, 212, 170, 0.1)',
+                tension: 0.4,
+                fill: true,
+                yAxisID: 'y1'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            plugins: {
+                legend: { labels: { color: '#ffffff' } },
+                title: {
+                    display: true,
+                    text: `Evolución de ${nombreEjercicio}`,
+                    color: '#ffffff'
+                }
+            },
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    beginAtZero: false,
+                    ticks: { color: '#a8b2d1' },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    title: {
+                        display: true,
+                        text: 'Peso (kg)',
+                        color: '#e94560'
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    grid: { drawOnChartArea: false },
+                    ticks: { color: '#a8b2d1' },
+                    title: {
+                        display: true,
+                        text: 'Repeticiones',
+                        color: '#00d4aa'
+                    }
+                },
+                x: {
+                    ticks: { color: '#a8b2d1' },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                }
+            }
+        }
+    });
+}
+
+// ==========================================
 // INICIALIZACIÓN DE LA APLICACIÓN
 // ==========================================
 
