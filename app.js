@@ -1329,6 +1329,282 @@ function renderizarGraficoProgreso(historial, nombreEjercicio) {
 }
 
 // ==========================================
+// EXPORTACIÓN DE DATOS SEMANALES
+// ==========================================
+
+function exportarDatosSemana() {
+    const hoy = new Date();
+    const inicioSemana = new Date(hoy);
+    inicioSemana.setDate(hoy.getDate() - hoy.getDay() + 1); // Lunes
+    inicioSemana.setHours(0, 0, 0, 0);
+    
+    const finSemana = new Date(inicioSemana);
+    finSemana.setDate(inicioSemana.getDate() + 6); // Domingo
+    finSemana.setHours(23, 59, 59, 999);
+    
+    // Generar contenido del archivo
+    let contenido = generarReporteSemanal(inicioSemana, finSemana);
+    
+    // Crear blob y descargar
+    const blob = new Blob([contenido], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    
+    const nombreArchivo = `rutina_semana_${formatearFechaArchivo(inicioSemana)}_${formatearFechaArchivo(finSemana)}.txt`;
+    link.download = nombreArchivo;
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    alert('✅ Datos exportados correctamente:\n' + nombreArchivo);
+}
+
+function formatearFechaArchivo(fecha) {
+    const dia = fecha.getDate().toString().padStart(2, '0');
+    const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+    const anio = fecha.getFullYear();
+    return `${dia}-${mes}-${anio}`;
+}
+
+function generarReporteSemanal(inicioSemana, finSemana) {
+    const faseInfo = calcularFaseActual();
+    const mesociclo = faseInfo.configSemana.mesociclo;
+    
+    let reporte = '';
+    
+    // ============================================
+    // ENCABEZADO
+    // ============================================
+    reporte += '═══════════════════════════════════════════════════════════════\n';
+    reporte += '             REPORTE DE ENTRENAMIENTO SEMANAL                  \n';
+    reporte += '═══════════════════════════════════════════════════════════════\n\n';
+    
+    reporte += `📅 Período: ${formatearFechaLegible(inicioSemana)} - ${formatearFechaLegible(finSemana)}\n`;
+    reporte += `📊 Fase Actual: ${faseInfo.fase.nombre}\n`;
+    reporte += `🏋️ Mesociclo: ${rutinasData[mesociclo].nombre}\n`;
+    reporte += `🎯 RIR Objetivo: ${faseInfo.configSemana.rir}\n`;
+    reporte += `🍽️ Calorías: ${faseInfo.configSemana.calorias}\n`;
+    reporte += `🏃 Cardio: ${faseInfo.configSemana.cardio}\n\n`;
+    
+    // ============================================
+    // RESUMEN DE VOLUMEN POR GRUPO MUSCULAR
+    // ============================================
+    const volumen = calcularVolumenSemanal();
+    const volumenTotal = Object.values(volumen).reduce((sum, v) => sum + v, 0);
+    
+    reporte += '═══════════════════════════════════════════════════════════════\n';
+    reporte += '                   VOLUMEN POR GRUPO MUSCULAR                  \n';
+    reporte += '═══════════════════════════════════════════════════════════════\n\n';
+    
+    Object.entries(volumen).forEach(([grupo, vol]) => {
+        const porcentaje = volumenTotal > 0 ? ((vol / volumenTotal) * 100).toFixed(1) : 0;
+        reporte += `${grupo.padEnd(15)} ${vol.toLocaleString().padStart(10)} kg  (${porcentaje}%)\n`;
+    });
+    
+    reporte += `\n${'TOTAL'.padEnd(15)} ${volumenTotal.toLocaleString().padStart(10)} kg\n\n`;
+    
+    // ============================================
+    // DETALLE DE ENTRENAMIENTOS POR DÍA
+    // ============================================
+    reporte += '═══════════════════════════════════════════════════════════════\n';
+    reporte += '              DETALLE DE ENTRENAMIENTOS POR DÍA                \n';
+    reporte += '═══════════════════════════════════════════════════════════════\n\n';
+    
+    for (let dia = 1; dia <= 3; dia++) {
+        const rutinaDia = rutinasData[mesociclo].dias[dia];
+        if (!rutinaDia || !rutinaDia.ejercicios) continue;
+        
+        reporte += `───────────────────────────────────────────────────────────────\n`;
+        reporte += `  ${rutinaDia.nombre}\n`;
+        reporte += `───────────────────────────────────────────────────────────────\n\n`;
+        
+        let haySesionesDia = false;
+        
+        rutinaDia.ejercicios.forEach((ejercicio, index) => {
+            const clave = `pesos_${mesociclo}_dia${dia}_ex${index}`;
+            const historial = JSON.parse(localStorage.getItem(clave) || '[]');
+            
+            // Filtrar solo registros de esta semana
+            const registrosSemana = historial.filter(reg => {
+                const fechaReg = new Date(reg.fecha);
+                return fechaReg >= inicioSemana && fechaReg <= finSemana;
+            });
+            
+            if (registrosSemana.length > 0) {
+                haySesionesDia = true;
+                reporte += `📍 ${ejercicio.nombre}\n`;
+                reporte += `   Objetivo: ${ejercicio.detalles} | RIR ${ejercicio.rir}\n\n`;
+                
+                // Agrupar por fecha
+                const porFecha = {};
+                registrosSemana.forEach(reg => {
+                    const fecha = new Date(reg.fecha).toLocaleDateString('es-ES');
+                    if (!porFecha[fecha]) porFecha[fecha] = [];
+                    porFecha[fecha].push(reg);
+                });
+                
+                Object.entries(porFecha).forEach(([fecha, sesiones]) => {
+                    reporte += `   🗓️  ${fecha}\n`;
+                    
+                    sesiones.forEach(reg => {
+                        const rirIndicador = obtenerIndicadorRIR(reg.rir);
+                        reporte += `      Serie ${reg.serie}: ${reg.peso}kg × ${reg.reps} reps `;
+                        reporte += `| RIR ${reg.rir} ${rirIndicador} | Vol: ${reg.volumen}kg\n`;
+                    });
+                    
+                    const volTotal = sesiones.reduce((sum, r) => sum + r.volumen, 0);
+                    const rirPromedio = (sesiones.reduce((sum, r) => sum + r.rir, 0) / sesiones.length).toFixed(1);
+                    reporte += `      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+                    reporte += `      Volumen sesión: ${volTotal}kg | RIR promedio: ${rirPromedio}\n\n`;
+                });
+                
+                reporte += '\n';
+            }
+        });
+        
+        if (!haySesionesDia) {
+            reporte += '   ❌ No se registraron entrenamientos este día\n\n';
+        }
+    }
+    
+    // ============================================
+    // ESTADÍSTICAS GENERALES
+    // ============================================
+    reporte += '═══════════════════════════════════════════════════════════════\n';
+    reporte += '                    ESTADÍSTICAS GENERALES                     \n';
+    reporte += '═══════════════════════════════════════════════════════════════\n\n';
+    
+    const estadisticas = calcularEstadisticasSemanales(inicioSemana, finSemana, mesociclo);
+    
+    reporte += `📊 Series totales completadas: ${estadisticas.seriesTotal}\n`;
+    reporte += `💪 Repeticiones totales: ${estadisticas.repsTotal}\n`;
+    reporte += `⚖️  Peso promedio levantado: ${estadisticas.pesoPromedio.toFixed(1)} kg\n`;
+    reporte += `🎯 RIR promedio registrado: ${estadisticas.rirPromedio.toFixed(1)}\n`;
+    reporte += `📈 Volumen total de la semana: ${volumenTotal.toLocaleString()} kg\n`;
+    reporte += `🏋️ Ejercicios únicos entrenados: ${estadisticas.ejerciciosUnicos}\n`;
+    reporte += `📅 Días de entrenamiento: ${estadisticas.diasEntrenados}\n\n`;
+    
+    // ============================================
+    // ANÁLISIS Y RECOMENDACIONES
+    // ============================================
+    reporte += '═══════════════════════════════════════════════════════════════\n';
+    reporte += '                 ANÁLISIS Y RECOMENDACIONES                    \n';
+    reporte += '═══════════════════════════════════════════════════════════════\n\n';
+    
+    const analisis = generarAnalisis(estadisticas, faseInfo);
+    reporte += analisis;
+    
+    // ============================================
+    // FOOTER
+    // ============================================
+    reporte += '\n═══════════════════════════════════════════════════════════════\n';
+    reporte += '          Generado por Tu Plan Gym PWA - ' + new Date().toLocaleString('es-ES') + '\n';
+    reporte += '═══════════════════════════════════════════════════════════════\n';
+    
+    return reporte;
+}
+
+function formatearFechaLegible(fecha) {
+    return fecha.toLocaleDateString('es-ES', { 
+        day: '2-digit', 
+        month: 'long', 
+        year: 'numeric' 
+    });
+}
+
+function obtenerIndicadorRIR(rir) {
+    if (rir === 0) return '🔥'; // Fallo
+    if (rir >= 1 && rir <= 2) return '✅'; // Óptimo
+    if (rir === 3) return '⚠️'; // Fácil
+    return '❌'; // Muy fácil
+}
+
+function calcularEstadisticasSemanales(inicioSemana, finSemana, mesociclo) {
+    let seriesTotal = 0;
+    let repsTotal = 0;
+    let pesosAcumulados = 0;
+    let rirAcumulado = 0;
+    let contadorRegistros = 0;
+    const ejerciciosSet = new Set();
+    const diasSet = new Set();
+    
+    for (let dia = 1; dia <= 3; dia++) {
+        const rutinaDia = rutinasData[mesociclo].dias[dia];
+        if (!rutinaDia || !rutinaDia.ejercicios) continue;
+        
+        rutinaDia.ejercicios.forEach((ejercicio, index) => {
+            const clave = `pesos_${mesociclo}_dia${dia}_ex${index}`;
+            const historial = JSON.parse(localStorage.getItem(clave) || '[]');
+            
+            const registrosSemana = historial.filter(reg => {
+                const fechaReg = new Date(reg.fecha);
+                return fechaReg >= inicioSemana && fechaReg <= finSemana;
+            });
+            
+            if (registrosSemana.length > 0) {
+                ejerciciosSet.add(ejercicio.nombre);
+                registrosSemana.forEach(reg => {
+                    diasSet.add(new Date(reg.fecha).toLocaleDateString());
+                    seriesTotal++;
+                    repsTotal += reg.reps;
+                    pesosAcumulados += reg.peso;
+                    rirAcumulado += reg.rir;
+                    contadorRegistros++;
+                });
+            }
+        });
+    }
+    
+    return {
+        seriesTotal,
+        repsTotal,
+        pesoPromedio: contadorRegistros > 0 ? pesosAcumulados / contadorRegistros : 0,
+        rirPromedio: contadorRegistros > 0 ? rirAcumulado / contadorRegistros : 0,
+        ejerciciosUnicos: ejerciciosSet.size,
+        diasEntrenados: diasSet.size
+    };
+}
+
+function generarAnalisis(estadisticas, faseInfo) {
+    let analisis = '';
+    
+    // Análisis de adherencia
+    if (estadisticas.diasEntrenados >= 3) {
+        analisis += '✅ Adherencia excelente: completaste al menos 3 días de entrenamiento.\n';
+    } else if (estadisticas.diasEntrenados >= 2) {
+        analisis += '⚠️  Adherencia moderada: solo ' + estadisticas.diasEntrenados + ' días entrenados esta semana.\n';
+    } else {
+        analisis += '❌ Adherencia baja: menos de 2 días de entrenamiento. Intenta mejorar la próxima semana.\n';
+    }
+    
+    // Análisis de RIR
+    const rirObjetivo = faseInfo.configSemana.rir;
+    if (estadisticas.rirPromedio >= 0 && estadisticas.rirPromedio <= 2) {
+        analisis += '✅ RIR promedio en zona óptima para hipertrofia (0-2).\n';
+    } else if (estadisticas.rirPromedio > 2 && estadisticas.rirPromedio <= 3) {
+        analisis += '⚠️  RIR promedio algo elevado. Considera aumentar cargas la próxima semana.\n';
+    } else if (estadisticas.rirPromedio > 3) {
+        analisis += '❌ RIR promedio demasiado alto. Debes incrementar significativamente los pesos.\n';
+    }
+    
+    // Análisis de volumen
+    if (estadisticas.seriesTotal >= 40) {
+        analisis += '💪 Volumen de entrenamiento alto: ' + estadisticas.seriesTotal + ' series totales.\n';
+    } else if (estadisticas.seriesTotal >= 30) {
+        analisis += '📊 Volumen moderado: ' + estadisticas.seriesTotal + ' series. Suficiente para mantener.\n';
+    } else {
+        analisis += '⚠️  Volumen bajo: solo ' + estadisticas.seriesTotal + ' series. Aumenta frecuencia o ejercicios.\n';
+    }
+    
+    analisis += '\n💡 Recuerda: la sobrecarga progresiva es clave. Busca mejorar peso o reps cada semana.\n';
+    
+    return analisis;
+}
+
+// ==========================================
 // INICIALIZACIÓN DE LA APLICACIÓN
 // ==========================================
 
