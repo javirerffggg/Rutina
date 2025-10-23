@@ -1632,6 +1632,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+    // Evento de exportación
+    document.getElementById('export-week-btn').addEventListener('click', exportarDatosSemana);
+
     // Eventos de temporizador
     document.getElementById('timer-start').addEventListener('click', iniciarTimer);
     document.getElementById('timer-pause').addEventListener('click', pausarTimer);
