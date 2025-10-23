@@ -1630,11 +1630,16 @@ document.addEventListener('DOMContentLoaded', () => {
             cerrarHistorialEjercicio();
         }
     });
+
+    document.getElementById('modal-historial').addEventListener('click', (e) => {
+    if (e.target.id === 'modal-historial') {
+        cerrarHistorialEjercicio();
+    }
 });
 
-    // Evento de exportación
+    // PEGA AQUÍ EL CÓDIGO CORTADO
     document.getElementById('export-week-btn').addEventListener('click', exportarDatosSemana);
-
+    
     // Eventos de temporizador
     document.getElementById('timer-start').addEventListener('click', iniciarTimer);
     document.getElementById('timer-pause').addEventListener('click', pausarTimer);
@@ -1653,7 +1658,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     document.getElementById('modal-peso').addEventListener('click', (e) => {
         if (e.target.id === 'modal-peso') cerrarModalPeso();
-    });
+
+});
     
     // Eventos de registro de progreso
     document.getElementById('guardar-medidas').addEventListener('click', guardarMedidas);
