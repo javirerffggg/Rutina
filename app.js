@@ -612,7 +612,8 @@ function renderizarModuloEntrenamiento(faseInfo, diaEntrenamiento) {
         const div = document.createElement('div');
         div.className = `exercise-item ${completado ? 'completed' : ''}`;
         div.dataset.index = index;
-        
+
+        // Dentro de renderizarModuloEntrenamiento, en el forEach de ejercicios:
         div.innerHTML = `
             <div class="exercise-header" onclick="toggleEjercicio(${index})">
                 <div class="checkbox"></div>
@@ -622,6 +623,9 @@ function renderizarModuloEntrenamiento(faseInfo, diaEntrenamiento) {
                 </div>
             </div>
             <div class="exercise-actions">
+                <button class="btn-exercise" onclick="abrirHistorialEjercicio(${index}, '${ejercicio.nombre}')">
+                    📊 Historial
+                </button>
                 <button class="btn-exercise" onclick="abrirModalPeso(${index}, '${ejercicio.nombre}')">
                     ⚖️ Peso
                 </button>
