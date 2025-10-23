@@ -1077,6 +1077,7 @@ function abrirModalPeso(index, nombreEjercicio) {
     document.getElementById('weight-input').value = '';
     document.getElementById('reps-input').value = '';
     document.getElementById('series-input').value = '1';
+    document.getElementById('rir-input').value = ''; // AÑADIR ESTA LÍNEA
     document.getElementById('modal-peso').classList.add('active');
 }
 
