@@ -1333,17 +1333,29 @@ function renderizarGraficoProgreso(historial, nombreEjercicio) {
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Renderizar pantalla inicial
+    // 1. Renderizar la pantalla inicial (solo una vez)
     renderizarPantallaHoy();
-    
-    // Eventos de navegación
+
+    // 2. Asignar eventos de navegación (un listener por cada item)
     document.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', (e) => {
             const pantalla = e.currentTarget.dataset.screen;
             cambiarPantalla(pantalla);
         });
     });
+
+    // 3. Asignar eventos del historial (solo una vez para toda la página)
+    // ESTA ES LA PARTE CORREGIDA
+    document.getElementById('close-historial').addEventListener('click', cerrarHistorialEjercicio);
     
+    document.getElementById('modal-historial').addEventListener('click', (e) => {
+        // Esta lógica para cerrar el modal al hacer clic fuera es correcta
+        if (e.target.id === 'modal-historial') {
+            cerrarHistorialEjercicio();
+        }
+    });
+});
+
     // Eventos de temporizador
     document.getElementById('timer-start').addEventListener('click', iniciarTimer);
     document.getElementById('timer-pause').addEventListener('click', pausarTimer);
