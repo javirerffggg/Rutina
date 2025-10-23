@@ -770,3 +770,59 @@ body {
     background: rgba(233, 69, 96, 0.2);
     color: var(--secondary);
 }
+
+/* ==========================================
+   VOLUMEN SEMANAL
+   ========================================== */
+.volume-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.volume-card {
+    background: var(--bg-light);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    border-left: 4px solid var(--secondary);
+}
+
+.volume-card.increase {
+    border-left-color: var(--success);
+}
+
+.volume-card.decrease {
+    border-left-color: var(--warning);
+}
+
+.volume-card-title {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.volume-card-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.volume-card-suffix {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.volume-card-change {
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+}
+
+.volume-up {
+    color: var(--success);
+}
+
+.volume-down {
+    color: var(--warning);
+}
